@@ -14,12 +14,10 @@ from aiofile import async_open
 from pathlib import Path
 from string import ascii_letters, punctuation
 from random import choice, randint
-from functools import cache
 
 # create files for testing purposes
 files_path = Path(full_path).joinpath("files") # path to files directory
 
-@cache
 async def main():
     char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
     async with async_open(files_path.joinpath("test.file.giga"), "wb") as dest:
