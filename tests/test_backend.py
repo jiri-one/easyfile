@@ -12,21 +12,34 @@ import pytest
 import asyncio
 from aiofile import async_open
 from pathlib import Path
+from string import ascii_letters, punctuation
+from random import choice, randint
+from functools import cache
 
 # create files for testing purposes
-fullPath = Path(full_path) # joinpath!!!!!!!!!!!!!!!!!!
-async with async_open("files", "wb") as dest:
-    async for chunk in src.iter_chunked(chunk_size):
-        await dest.write(chunk)
-with open('my_file', 'wb') as f:
-    num_chars = 1024 * 1024 * 1024
-    f.write('0' * num_chars)
+files_path = Path(full_path).joinpath("files") # path to files directory
+
+@cache
+async def main():
+    char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
+    async with async_open(files_path.joinpath("test.file.giga"), "wb") as dest:
+        await dest.write(char_to_file * (1024 * 1024 * 1024)) # create 1GB file
+    
+    
+    char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
+    for file_number in range(1,101):
+        async with async_open(files_path.joinpath(f"test.file.{file_number}"), "wb") as dest:
+            await dest.write(char_to_file * randint(0, 1024 * 1024)) # create 100 files of random size to 1MB     
+
+asyncio.run(main())
+
 
 # imports of internal functions, which will be tested
-from backend.operations import copy_one_file
+#from backend.operations import copy_one_file
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 
 print(__file__)
 
+# at the succesfull test, you need to delete all testing files
