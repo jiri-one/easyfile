@@ -58,7 +58,7 @@ async def test_copy_one_file():
     src_hash = await hash_file(src_file)
     dest_hash = await hash_file(Path(dest_file))
     
-    print(src_hash, "\n", dest_hash)
+    print(src_file, ":", src_hash, "\n", dest_file, ":", dest_hash)
     assert src_hash == dest_hash
     
 
