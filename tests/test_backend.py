@@ -52,16 +52,17 @@ pytestmark = pytest.mark.asyncio
 
 @cache
 async def test_copy_one_file():
-    src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}")
-    dest_file = str(src_file) + "_copied"
-    await copy_one_file(src_file, dest_file)
-    src_hash = await hash_file(src_file)
-    dest_hash = await hash_file(Path(dest_file))
-    
-    print(src_file, ":", src_hash, "\n", dest_file, ":", dest_hash)
-    assert src_hash == dest_hash
+    """Testing function, where we test copy one file and test, if the copied file is same like source file"""
+    src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}") # randomly choose one file for copy
+    dest_file = str(src_file) + "_copied" # name of destination file (it have to be string, because the file is not exists)
+    await copy_one_file(src_file, dest_file) # make a copy of file
+    src_hash = await hash_file(src_file) # hash of source file
+    dest_hash = await hash_file(Path(dest_file)) # hash of destination file
+    # print(src_file, ":", src_hash, "\n", dest_file, ":", dest_hash) # only for visual testing of hashes 
+    assert src_hash == dest_hash # hashes have to be same
     
 
 print(__file__)
 
 # at the succesfull test, you need to delete all testing files
+# it will be goog to test hash function too
