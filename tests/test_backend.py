@@ -1,11 +1,4 @@
-# this file contains only testing functions
-
-# I need to add this lines, because I would like to import easily from main directory
-import os, sys 
-full_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if full_path not in sys.path:
-    sys.path.insert(0,full_path)
-# os.chdir(full_path) # switch working directory to EasyFile main directory
+# this file contains only testing functions and helper functions for testing
 
 # imports needed for testing
 import pytest
@@ -14,8 +7,14 @@ from aiofile import async_open
 from pathlib import Path
 from string import ascii_letters, punctuation
 from random import choice, randint
-from hashlib import sha256
 from functools import cache
+from sys import path as sys_path
+
+# I need to add this lines, because I would like to import easily from main directory
+full_path = str(Path(__file__).parent.parent)
+if full_path not in sys_path:
+    sys_path.insert(0,full_path)
+# os.chdir(full_path) # switch working directory to EasyFile main directory
 
 # create files for testing purposes
 files_path = Path(full_path).joinpath("files") # path to files directory
@@ -36,10 +35,12 @@ async def create_100_files():
             await dest.write(char_to_file * randint(0, 1024 * 1024)) # create 100 files of random size to 1MB       
 
 async def main():
-    for task in (create_giga_file, create_100_files):
-        await asyncio.create_task(task())
+    await asyncio.gather(create_giga_file(), create_100_files())
+    #for task in (create_giga_file, create_100_files):
+        #await asyncio.create_task(task())
   
-asyncio.run(main())
+asyncio.run(main()) # main loop for helper functions
+# thats the end of helper functions
 
 # imports of helper functions
 from backend.helpers import hash_file
