@@ -6,7 +6,7 @@ import asyncio
 from aiofile import async_open
 from pathlib import Path
 from string import ascii_letters, punctuation
-from random import choice, randint
+from random import choice, randint, sample
 from functools import cache
 from sys import path as sys_path
 
@@ -27,7 +27,7 @@ async def create_giga_file():
 
 @cache        
 async def create_100_files():
-    """This corutine will create 100 files with random size, every file named test.file.NUM in folder files"""
+    """This corutine will create 100 files with random size and random content, every file named test.file.NUM in folder files"""
     for file_number in range(1,101):
         file_number = str(file_number).zfill(3)
         char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
@@ -46,23 +46,35 @@ asyncio.run(main()) # main loop for helper functions
 from backend.helpers import hash_file
 
 # imports of internal functions, which will be tested
-from backend.operations import copy_one_file
+from backend.operations import copy_one_file, copy_file_list
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
+
+files_to_delete = []
 
 @cache
 async def test_copy_one_file():
     """Testing function, where we test copy one file and test, if the copied file is same like source file"""
     src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}") # randomly choose one file for copy
-    dest_file = str(src_file) + "_copied" # name of destination file (it have to be string, because the file is not exists)
+    dest_file = src_file.with_name(str(src_file.name) + "_copied") # name of destination file
     await copy_one_file(src_file, dest_file) # make a copy of file
     src_hash = await hash_file(src_file) # hash of source file
-    dest_hash = await hash_file(Path(dest_file)) # hash of destination file
+    dest_hash = await hash_file(dest_file) # hash of destination file
     # print(src_file, ":", src_hash, "\n", dest_file, ":", dest_hash) # only for visual testing of hashes 
     assert src_hash == dest_hash # hashes have to be same
-    
 
+@cache
+async def test_copy_file_list():
+    """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
+    file_list = [f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
+    hash_dict = {}
+    for file in file_list:
+        file_hash = await hash_file(files_path.joinpath(file))
+        hash_dict[file] = file_hash
+    dest_folder = files_path.joinpath("dest_folder")
+    await copy_file_list([files_path.joinpath(file) for file in file_list], dest_folder)
+    
 print(__file__)
 
 # at the succesfull test, you need to delete all testing files
