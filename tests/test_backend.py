@@ -68,12 +68,12 @@ async def test_copy_one_file():
 async def test_copy_file_list():
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
     file_list = [f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
-    hash_dict = {}
-    for file in file_list:
-        file_hash = await hash_file(files_path.joinpath(file))
-        hash_dict[file] = file_hash
     dest_folder = files_path.joinpath("dest_folder")
     await copy_file_list([files_path.joinpath(file) for file in file_list], dest_folder)
+    for file in file_list:
+        file_hash_src = await hash_file(files_path.joinpath(file))
+        file_hash_dest = await hash_file(dest_folder.joinpath(file))
+        assert file_hash_src == file_hash_dest
     
 print(__file__)
 
