@@ -18,6 +18,7 @@ if full_path not in sys_path:
 
 # create files for testing purposes
 files_path = Path(full_path).joinpath("files") # path to files directory
+files_path.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
 
 async def create_giga_file():
     """This corutine will create one file named test.file.giga in folder files"""
@@ -58,7 +59,7 @@ async def test_copy_one_file():
     """Testing function, where we test copy one file and test, if the copied file is same like source file"""
     src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}") # randomly choose one file for copy
     dest_file = src_file.with_name(str(src_file.name) + "_copied") # name of destination file
-    await copy_one_file(src_file, dest_file) # make a copy of file
+    await copy_one_file(src=src_file, dest=dest_file) # make a copy of file
     src_hash = await hash_file(src_file) # hash of source file
     dest_hash = await hash_file(dest_file) # hash of destination file
     # print(src_file, ":", src_hash, "\n", dest_file, ":", dest_hash) # only for visual testing of hashes 
@@ -69,6 +70,7 @@ async def test_copy_file_list():
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
     file_list = [f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
     dest_folder = files_path.joinpath("dest_folder")
+    dest_folder.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
     await copy_file_list([files_path.joinpath(file) for file in file_list], dest_folder)
     for file in file_list:
         file_hash_src = await hash_file(files_path.joinpath(file))
@@ -77,5 +79,6 @@ async def test_copy_file_list():
     
 print(__file__)
 
+# test for hash function
 # at the succesfull test, you need to delete all testing files
 # it will be goog to test hash function too

@@ -1,5 +1,7 @@
 from hashlib import sha256
 from aiofile import async_open
+from pathlib import Path
+import functools
 
 async def hash_file(filename):
     """"This function returns the SHA-256 hash
@@ -15,3 +17,15 @@ async def hash_file(filename):
 
     # return the hex representation of digest
     return h.hexdigest()
+
+
+def path_handler(*args, **kwargs):
+    def decorator(func):
+        @functools.wraps(func)
+        def decorated_func(*args, **kwargs):
+            if i == 1:
+                raise Exception # I hope this is just for testing... better create a new exception for this
+            else:
+                return func(*a, **k)
+        return decorated_func
+    return decorator
