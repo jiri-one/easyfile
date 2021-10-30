@@ -19,13 +19,15 @@ async def hash_file(filename):
     return h.hexdigest()
 
 
-def path_handler(*args, **kwargs):
-    def decorator(func):
-        @functools.wraps(func)
-        def decorated_func(*args, **kwargs):
-            if i == 1:
-                raise Exception # I hope this is just for testing... better create a new exception for this
-            else:
-                return func(*a, **k)
-        return decorated_func
-    return decorator
+#def path_handler(*args, **kwargs):
+    #def decorator(func):
+        #@functools.wraps(func)
+        #def decorated_func(*args, **kwargs):
+            #if type(args[0]) == Path and type(args[0]) == Path:
+                
+            #if i == 1:
+                #raise Exception # I hope this is just for testing... better create a new exception for this
+            #else:
+                #return func(*a, **k)
+        #return decorated_func
+    #return decorator
