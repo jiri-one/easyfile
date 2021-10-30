@@ -17,13 +17,13 @@ if full_path not in sys_path:
 # os.chdir(full_path) # switch working directory to EasyFile main directory
 
 # create files for testing purposes
-files_path = Path(full_path).joinpath("tests").joinpath("files") # path to files directory
+files_path = Path(full_path) / "tests" / "files" # path to files directory
 files_path.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
 
 async def create_giga_file():
     """This corutine will create one file named test.file.giga in folder files"""
     char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
-    async with async_open(files_path.joinpath("test.file.giga"), "wb") as dest:
+    async with async_open(files_path / "test.file.giga", "wb") as dest:
         await dest.write(char_to_file * (1024 * 1024 * 1024)) # create 1GB file
 
 @cache        
@@ -32,7 +32,7 @@ async def create_100_files():
     for file_number in range(1,101):
         file_number = str(file_number).zfill(3)
         char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
-        async with async_open(files_path.joinpath(f"test.file.{file_number}"), "wb") as dest:
+        async with async_open(files_path / f"test.file.{file_number}", "wb") as dest:
             await dest.write(char_to_file * randint(0, 1024 * 1024)) # create 100 files of random size to 1MB       
 
 async def main():
@@ -69,12 +69,12 @@ async def test_copy_one_file():
 async def test_copy_file_list():
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
     file_list = [f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
-    dest_folder = files_path.joinpath("dest_folder")
+    dest_folder = files_path / "dest_folder"
     dest_folder.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
-    await copy_file_list([files_path.joinpath(file) for file in file_list], dest_folder)
+    await copy_file_list([files_path / file for file in file_list], dest_folder)
     for file in file_list:
-        file_hash_src = await hash_file(files_path.joinpath(file))
-        file_hash_dest = await hash_file(dest_folder.joinpath(file))
+        file_hash_src = await hash_file(files_path / file)
+        file_hash_dest = await hash_file(dest_folder / file)
         assert file_hash_src == file_hash_dest
     
 print(__file__)
