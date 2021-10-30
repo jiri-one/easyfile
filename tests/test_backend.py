@@ -17,7 +17,7 @@ if full_path not in sys_path:
 # os.chdir(full_path) # switch working directory to EasyFile main directory
 
 # create files for testing purposes
-files_path = Path(full_path).joinpath("files") # path to files directory
+files_path = Path(full_path).joinpath("tests").joinpath("files") # path to files directory
 files_path.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
 
 async def create_giga_file():
