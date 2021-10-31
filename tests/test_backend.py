@@ -16,48 +16,56 @@ if full_path not in sys_path:
     sys_path.insert(0,full_path)
 # os.chdir(full_path) # switch working directory to EasyFile main directory
 
-# create files for testing purposes
-files_path = Path(full_path) / "tests" / "files" # path to files directory
-files_path.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
-
-async def create_giga_file():
-    """This corutine will create one file named test.file.giga in folder files"""
-    char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
-    async with async_open(files_path / "test.file.giga", "wb") as dest:
-        await dest.write(char_to_file * (1024 * 1024 * 1024)) # create 1GB file
-
-@cache        
-async def create_100_files():
-    """This corutine will create 100 files with random size and random content, every file named test.file.NUM in folder files"""
-    for file_number in range(1,101):
-        file_number = str(file_number).zfill(3)
-        char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
-        async with async_open(files_path / f"test.file.{file_number}", "wb") as dest:
-            await dest.write(char_to_file * randint(0, 1024 * 1024)) # create 100 files of random size to 1MB       
-
-async def main():
-    await asyncio.gather(create_giga_file(), create_100_files())
-    #for task in (create_giga_file, create_100_files):
-        #await asyncio.create_task(task())
-  
-asyncio.run(main()) # main loop for helper functions
-# thats the end of helper functions
-
 # imports of helper functions
 from backend.helpers import hash_file
 
 # imports of internal functions, which will be tested
 from backend.operations import copy_one_file, copy_file_list
 
+# END OF IMPORTS
+
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 
-files_to_delete = []
+# pytest fixtures (helper functions for tests)
+
+@pytest.fixture(scope="session", autouse=True)
+def event_loop():
+    """We need only one asyncio loop for all fixtures, because is better to create test files only once."""
+    loop =  asyncio.new_event_loop()
+    return loop
 
 @cache
-async def test_copy_one_file():
+@pytest.fixture(scope="session")
+async def giga_file(event_looper, tmp_path_factory):
+    """This corutine will create one file named test.file.giga in folder files"""
+    giga_file_path = tmp_path_factory.mktemp("files") / "test.file.giga"
+    char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
+    async with async_open(giga_file_path, "wb") as dest:
+        await dest.write(char_to_file * (1024 * 1024 * 1024)) # create 1GB file
+    return giga_file_path
+
+@cache
+@pytest.fixture(scope="session")
+async def hundred_files(event_loop, tmp_path_factory):
+    """This corutine will create 100 files with random size and random content, every file named test.file.NUM in folder files"""
+    hundred_files_path = tmp_path_factory.mktemp("files")
+    for file_number in range(1,101):
+        file_number = str(file_number).zfill(3)
+        char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
+        async with async_open(hundred_files_path / f"test.file.{file_number}", "wb") as dest:
+            await dest.write(char_to_file * randint(0, 1024 * 1024)) # create 100 files of random size to 1MB
+    return hundred_files_path
+
+# thats the end of fixtures
+
+# TESTS
+
+@cache
+async def test_copy_one_file(hundred_files):
     """Testing function, where we test copy one file and test, if the copied file is same like source file"""
-    src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}") # randomly choose one file for copy
+    #src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}") # randomly choose one file for copy
+    src_file = hundred_files / f"test.file.{str(randint(1, 100)).zfill(3)}"
     dest_file = src_file.with_name(str(src_file.name) + "_copied") # name of destination file
     await copy_one_file(src=src_file, dest=dest_file) # make a copy of file
     src_hash = await hash_file(src_file) # hash of source file
@@ -66,14 +74,14 @@ async def test_copy_one_file():
     assert src_hash == dest_hash # hashes have to be same
 
 @cache
-async def test_copy_file_list():
+async def test_copy_file_list(hundred_files):
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
     file_list = [f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
-    dest_folder = files_path / "dest_folder"
+    dest_folder = hundred_files / "dest_folder"
     dest_folder.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
-    await copy_file_list([files_path / file for file in file_list], dest_folder)
+    await copy_file_list([hundred_files / file for file in file_list], dest_folder)
     for file in file_list:
-        file_hash_src = await hash_file(files_path / file)
+        file_hash_src = await hash_file(hundred_files / file)
         file_hash_dest = await hash_file(dest_folder / file)
         assert file_hash_src == file_hash_dest
     
