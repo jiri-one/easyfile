@@ -89,5 +89,4 @@ async def test_copy_file_list(hundred_files):
 print(__file__)
 
 # test for hash function
-# at the succesfull test, you need to delete all testing files
 # it will be goog to test hash function too
