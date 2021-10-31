@@ -33,7 +33,8 @@ pytestmark = pytest.mark.asyncio
 def event_loop():
     """We need only one asyncio loop for all fixtures, because is better to create test files only once."""
     loop =  asyncio.new_event_loop()
-    return loop
+    yield loop
+    loop.close()
 
 @cache
 @pytest.fixture(scope="session")
