@@ -68,7 +68,7 @@ async def test_copy_one_file(hundred_files):
     #src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}") # randomly choose one file for copy
     src_file = hundred_files / f"test.file.{str(randint(1, 100)).zfill(3)}"
     dest_file = src_file.with_name(str(src_file.name) + "_copied") # name of destination file
-    await copy_one_file(src=src_file, dest=dest_file) # make a copy of file
+    await copy_one_file(src_file=src_file, dest_file=dest_file) # make a copy of file
     src_hash = await hash_file(src_file) # hash of source file
     dest_hash = await hash_file(dest_file) # hash of destination file
     # print(src_file, ":", src_hash, "\n", dest_file, ":", dest_hash) # only for visual testing of hashes 
@@ -80,7 +80,7 @@ async def test_copy_file_list(hundred_files):
     file_list = [f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
     dest_folder = hundred_files / "dest_folder"
     dest_folder.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
-    await copy_file_list([hundred_files / file for file in file_list], dest_folder)
+    await copy_file_list(file_list = [hundred_files / file for file in file_list], dest_folder = dest_folder)
     for file in file_list:
         file_hash_src = await hash_file(hundred_files / file)
         file_hash_dest = await hash_file(dest_folder / file)
