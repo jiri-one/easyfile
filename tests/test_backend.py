@@ -8,27 +8,15 @@ from pathlib import Path
 from string import ascii_letters, punctuation
 from random import choice, randint, sample
 from functools import cache
-from sys import path as sys_path
 
-# I need to add this lines, because I would like to import easily from main directory
-full_path = str(Path(__file__).parent.parent)
-if full_path not in sys_path:
-    sys_path.insert(0,full_path)
-# os.chdir(full_path) # switch working directory to EasyFile main directory
-
-# imports of helper functions
-from backend.helpers import hash_file
-
-# imports of internal functions, which will be tested
-from backend.operations import copy_one_file, copy_file_list
-
+# internal imports
+from easyfile.backend import hash_file, copy_one_file, copy
 # END OF IMPORTS
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
 
 # pytest fixtures (helper functions for tests)
-
 @pytest.fixture(scope="session", autouse=True)
 def event_loop():
     """We need only one asyncio loop for all fixtures, because is better to create test files only once."""
@@ -80,7 +68,7 @@ async def test_copy_file_list(hundred_files):
     file_list = [f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
     dest_folder = hundred_files / "dest_folder"
     dest_folder.mkdir(parents=True, exist_ok=True) # we need to create that directory, if not exists
-    await copy_file_list(file_list = [hundred_files / file for file in file_list], dest_folder = dest_folder)
+    await copy(file_list = [hundred_files / file for file in file_list], dest_folder = dest_folder)
     for file in file_list:
         file_hash_src = await hash_file(hundred_files / file)
         file_hash_dest = await hash_file(dest_folder / file)
