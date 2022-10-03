@@ -70,6 +70,18 @@ async def test_copy_one_file_but_dir(hundred_files: Path, tmp_path: Path):
     with pytest.raises(TypeError):
         await copy_one_file(src_dir, dest_file)
 
+async def test_copy_one_file_non_existent_file(tmp_path: Path):
+    """Testing function, where we test copy one non-existent file - with str and Path type"""
+    src_file = tmp_path / "XXXXXXX"
+    dest_file = tmp_path / "XXXXXXX"
+    with pytest.raises(TypeError):
+        await copy_one_file(src_file, dest_file)
+    src_file = "XXXXXXXXXXXXX"
+    dest_file = tmp_path / "XXXXXXXXXXXXX"
+    with pytest.raises(TypeError):
+        await copy_one_file(src_file, dest_file)
+    
+
 #@cache
 async def test_copy_file_list(hundred_files):
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""

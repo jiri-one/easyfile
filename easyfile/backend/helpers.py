@@ -21,12 +21,21 @@ async def hash_file(filename):
 def one_file_handler(f):
     @wraps(f) # sugar
     def wrapper(src_file, dest_file, **kwargs):
+        # handle src_file
+        if isinstance(src_file, str):
+            src_file = Path(src_file)
         if isinstance(src_file, Path):
-            if src_file.is_file():
-                return f(src_file, dest_file, **kwargs)
-            else:
+            if not src_file.is_file():
                 raise TypeError("Arguments src_file has to be file!")
-        
+        # handle dest_path
+        if isinstance(dest_file, str):
+            dest_file = Path(dest_file)
+        if isinstance(dest_file, Path):
+            if not dest_file.parent.exists():
+                raise ValueError("non-existent destination directory!")
+            if dest_file.exists():
+                raise ValueError("Arguments src_file shall not exist!")
+        return f(src_file, dest_file, **kwargs)
 
         #     case ["src_file", "dest_file", *others]:
         #         src_file = kwargs["src_file"]
