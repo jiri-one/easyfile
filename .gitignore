@@ -2,4 +2,4 @@ venv
 __pycache__
 files
 .pytest_cache
-
+.vscode
