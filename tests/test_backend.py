@@ -10,7 +10,7 @@ from random import choice, randint, sample
 from functools import cache
 
 # internal imports
-from easyfile.backend import hash_file, copy_one_file, copy
+from easyfile.backend import hash_file, _copy_one_file, copy
 # END OF IMPORTS
 
 # All test coroutines will be treated as marked.
@@ -56,11 +56,12 @@ async def test_copy_one_file(hundred_files: Path):
     #src_file = files_path.joinpath(f"test.file.{str(randint(1, 100)).zfill(3)}") # randomly choose one file for copy
     src_file = hundred_files / f"test.file.{str(randint(1, 100)).zfill(3)}"
     dest_file = src_file.with_name(str(src_file.name) + "_copied") # name of destination file
-    await copy_one_file(src_file, dest_file) # make a copy of file
+    await _copy_one_file(src_file, dest_file) # make a copy of file
     src_hash = await hash_file(src_file) # hash of source file
     dest_hash = await hash_file(dest_file) # hash of destination file
     # print(src_file, ":", src_hash, "\n", dest_file, ":", dest_hash) # only for visual testing of hashes 
     assert src_hash == dest_hash # hashes have to be same
+
 
 async def test_copy_one_file_but_dir(hundred_files: Path, tmp_path: Path):
     """Testing function, where we test copy one directory and not file."""
@@ -68,19 +69,35 @@ async def test_copy_one_file_but_dir(hundred_files: Path, tmp_path: Path):
     src_dir.mkdir()
     dest_file = tmp_path / "some.file"
     with pytest.raises(TypeError):
-        await copy_one_file(src_dir, dest_file)
+        await _copy_one_file(src_dir, dest_file)
 
-async def test_copy_one_file_non_existent_file(tmp_path: Path):
-    """Testing function, where we test copy one non-existent file - with str and Path type"""
+
+async def test_copy_one_non_existent_file(tmp_path: Path):
+    """Testing function, where we test copy one non-existent file."""
     src_file = tmp_path / "XXXXXXX"
     dest_file = tmp_path / "XXXXXXX"
-    with pytest.raises(TypeError):
-        await copy_one_file(src_file, dest_file)
-    src_file = "XXXXXXXXXXXXX"
-    dest_file = tmp_path / "XXXXXXXXXXXXX"
-    with pytest.raises(TypeError):
-        await copy_one_file(src_file, dest_file)
-    
+    with pytest.raises(FileNotFoundError):
+        await _copy_one_file(src_file, dest_file)
+
+
+async def test_copy_one_non_existent_file(tmp_path: Path):
+    """Testing function, where we test copy one non-existent file."""
+    src_file = tmp_path / "XXXXXXX"
+    dest_file = tmp_path / "XXXXXXX"
+    with pytest.raises(FileNotFoundError):
+        await _copy_one_file(src_file, dest_file)
+
+
+async def test_copy_to_existing_file(tmp_path: Path):
+    """Testing function, where we test copy to already existing file."""
+    src_file = tmp_path / "src_file"
+    dest_file = tmp_path / "dest_file"
+    with open(src_file, "w"):
+        pass # only create empty_file
+    with open(dest_file, "w"):
+        pass # only create empty_file
+    with pytest.raises(FileExistsError):
+        await _copy_one_file(src_file, dest_file)
 
 #@cache
 async def test_copy_file_list(hundred_files):
