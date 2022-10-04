@@ -23,12 +23,12 @@ def one_file_handler(f):
     def wrapper(src_file: Path, dest_file: Path, **kwargs):
         # handle src_file
         if src_file.is_dir():
-            raise TypeError("src_file has to be only file!")
-        if not src_file.is_file() or not src_file.exists():
+            raise IsADirectoryError("src_file has to be only file!")
+        if not src_file.is_file():
             raise FileNotFoundError("Arguments src_file has to be EXISTING FILE!")
         # handle dest_file
         if dest_file.is_dir():
-            raise TypeError("dest_file has to be only file and shall not exist!")
+            raise IsADirectoryError("dest_file has to be only file and shall not exist!")
         if dest_file.is_file():
             raise FileExistsError("Arguments src_file shall not exist!")
         return f(src_file, dest_file, **kwargs)
