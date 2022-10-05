@@ -20,7 +20,7 @@ async def hash_file(filename):
 
 def one_file_handler(f):
     @wraps(f) # sugar
-    def wrapper(src_file: Path, dest_file: Path, **kwargs):
+    def wrapper(self, src_file: Path, dest_file: Path, **kwargs):
         # handle src_file
         if src_file.is_dir():
             raise IsADirectoryError("src_file has to be only file!")
@@ -30,6 +30,17 @@ def one_file_handler(f):
         if dest_file.is_dir():
             raise IsADirectoryError("dest_file has to be only file and shall not exist!")
         if dest_file.is_file():
-            raise FileExistsError("Arguments src_file shall not exist!")
-        return f(src_file, dest_file, **kwargs)
+            raise FileExistsError("Arguments dest_file shall not exist!")
+        return f(self, src_file, dest_file, **kwargs)
+    return wrapper
+
+
+def copy_handler(f):
+    @wraps(f) # sugar
+    def wrapper(self, path_list, dest, **kwargs):
+        # if isinstance(path_list, list):
+        #     new_path_list = []
+        #     for path in path_list:
+        #         new_path_list.append(Path(path))
+        return f(self, path_list, dest, **kwargs)
     return wrapper
