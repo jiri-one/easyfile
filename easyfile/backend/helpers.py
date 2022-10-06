@@ -18,7 +18,7 @@ async def hash_file(filename):
     # return the hex representation of digest
     return h.hexdigest()
 
-def one_file_handler(f):
+def one_file_argument_handler(f):
     @wraps(f) # sugar
     def wrapper(self, src_file: Path, dest_file: Path, **kwargs):
         # handle src_file
@@ -35,7 +35,7 @@ def one_file_handler(f):
     return wrapper
 
 
-def copy_handler(f):
+def copy_argument_handler(f):
     @wraps(f) # sugar
     def wrapper(self, path_list, dest, **kwargs):
         # if isinstance(path_list, list):

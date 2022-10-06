@@ -8,6 +8,7 @@ from pathlib import Path
 from string import ascii_letters, punctuation
 from random import choice, randint, sample
 from functools import cache
+from os import walk
 
 # internal imports
 from easyfile.backend import EasyFile, hash_file
@@ -55,7 +56,6 @@ async def hundred_files(event_loop, tmp_path_factory):
 # thats the end of fixtures
 
 # TESTS
-
 
 async def test_successful_copy_one_file(hundred_files: Path):
     """Testing function, where we test copy one file and test, if the copied file is same like source file"""
@@ -108,7 +108,7 @@ async def test_copy_to_existing_file(hundred_files: Path, tmp_path: Path):
         await ef._copy_one_file(src_file, dest_file)
 
 
-async def test_copy_file_list(hundred_files):
+async def test_copy_only_files_in_list(hundred_files):
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
     ef = EasyFile()
     file_list = [
@@ -121,5 +121,38 @@ async def test_copy_file_list(hundred_files):
         file_hash_src = await hash_file(hundred_files / file)
         file_hash_dest = await hash_file(dest_folder / file)
         assert file_hash_src == file_hash_dest
+
+
+async def test_copy_files_and_dirs_in_list(hundred_files, tmp_path):
+    """Testing function, where we copy random files and dirs and test, if the copied files and dirs are same like source files"""
+    ef = EasyFile()
+    folder_to_copy = tmp_path / "folder_to_copy"
+    folder1 = folder_to_copy / "src_folder1"
+    subfolder1 = folder1 / "src_subfolder1"
+    subsubfolder = subfolder1 / "subsubfolder"
+    folder2 = folder_to_copy / "src_folder2"
+    subfolder2 = folder2 / "src_subfolder2"
+    subsubfolder.mkdir(parents=True, exist_ok=True)
+    subfolder2.mkdir(parents=True, exist_ok=True)
+    folders = [folder_to_copy, folder1, subfolder1, folder2, subfolder2, subsubfolder]
+    file_list = sample(list(hundred_files.iterdir()), 20)
+    dest_folder = tmp_path / "dest_folder"
+    dest_folder.mkdir(parents=True, exist_ok=True)
+    for file in file_list:
+        # copy random files to random folders
+        await ef.copy([file], choice(folders))
+    await ef.copy([folder_to_copy], dest_folder)
+    for ((src_dirpath,
+        src_dirnames,
+        src_filenames),
+        (des_dirpath,
+        des_dirnames,
+        des_filenames)) in zip(walk(folder_to_copy), walk(dest_folder / folder_to_copy)):
+        assert src_dirpath == des_dirpath
+        for src_dirname, des_dirname in zip(src_dirnames, des_dirnames):
+            assert src_dirname == des_dirname
+        for src_filename, des_filename in zip(src_filenames, des_filenames):
+            assert src_filename == des_filename
+        
 
 # test for hash function
