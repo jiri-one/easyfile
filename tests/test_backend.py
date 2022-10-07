@@ -156,6 +156,13 @@ async def test_copy_empty_file_list(tmp_path):
     file_list = []
     with pytest.raises(ValueError):
         await ef.copy(file_list, tmp_path)
+
+
+async def test_copy_list_with_no_paths_or_strings(tmp_path):
+    ef = EasyFile()
+    file_list = [1,2,3]
+    with pytest.raises(TypeError):
+        await ef.copy(file_list, tmp_path)
         
 
 # test for hash function
