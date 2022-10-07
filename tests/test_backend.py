@@ -150,6 +150,12 @@ async def test_copy_files_and_dirs_in_list(hundred_files, tmp_path):
             assert src_dirname == des_dirname
         for src_filename, des_filename in zip(src_filenames, dest_filenames):
             assert src_filename == des_filename
+
+async def test_copy_empty_file_list(tmp_path):
+    ef = EasyFile()
+    file_list = []
+    with pytest.raises(ValueError):
+        await ef.copy(file_list, tmp_path)
         
 
 # test for hash function
