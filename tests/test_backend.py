@@ -108,12 +108,12 @@ async def test_copy_to_existing_file(hundred_files: Path, tmp_path: Path):
         await ef._copy_one_file(src_file, dest_file)
 
 
-async def test_copy_only_files_in_list(hundred_files):
+async def test_copy_only_files_in_list(hundred_files: Path, tmp_path: Path):
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
     ef = EasyFile()
     file_list = [
         f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
-    dest_folder = hundred_files / "dest_folder"
+    dest_folder = tmp_path / "dest_folder"
     # we need to create that directory, if not exists
     dest_folder.mkdir(parents=True, exist_ok=True)
     await ef.copy([hundred_files / file for file in file_list], dest_folder)
