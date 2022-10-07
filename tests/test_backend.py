@@ -57,12 +57,12 @@ async def hundred_files(event_loop, tmp_path_factory):
 
 # TESTS
 
-async def test_successful_copy_one_file(hundred_files: Path):
+async def test_successful_copy_one_file(hundred_files: Path, tmp_path: Path):
     """Testing function, where we test copy one file and test, if the copied file is same like source file"""
     ef = EasyFile()
     src_file = hundred_files / f"test.file.{str(randint(1, 100)).zfill(3)}"
-    dest_file = src_file.with_name(
-        str(src_file.name) + "_copied")  # name of destination file
+    dest_file = tmp_path / src_file.with_name(
+        str(src_file.name) + "_copied").name  # name of destination file
     await ef._copy_one_file(src_file, dest_file)  # make a copy of file
     src_hash = await hash_file(src_file)  # hash of source file
     dest_hash = await hash_file(dest_file)  # hash of destination file
@@ -84,7 +84,7 @@ async def test_copy_one_non_existent_file(tmp_path: Path):
     """Testing function, where we test copy one non-existent file."""
     ef = EasyFile()
     src_file = tmp_path / "XXXXXXX"
-    dest_file = tmp_path / "XXXXXXX"
+    dest_file = tmp_path / "XXXXXXX_copied"
     with pytest.raises(FileNotFoundError):
         await ef._copy_one_file(src_file, dest_file)
 
