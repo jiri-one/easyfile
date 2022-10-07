@@ -140,18 +140,15 @@ async def test_copy_files_and_dirs_in_list(hundred_files, tmp_path):
     dest_folder.mkdir(parents=True, exist_ok=True)
     for file in file_list:
         # copy random files to random folders
-        await ef.copy([file], choice(folders))
+        await ef._copy_one_file(file, choice(folders) / file.name)
     await ef.copy([folder_to_copy], dest_folder)
-    for ((src_dirpath,
-        src_dirnames,
-        src_filenames),
-        (des_dirpath,
-        des_dirnames,
-        des_filenames)) in zip(walk(folder_to_copy), walk(dest_folder / folder_to_copy)):
-        assert src_dirpath == des_dirpath
-        for src_dirname, des_dirname in zip(src_dirnames, des_dirnames):
+    for src_walk_output, dest_walk_output in zip(walk(folder_to_copy), walk(dest_folder / folder_to_copy)):
+        src_dirpath, src_dirnames, src_filenames = src_walk_output
+        dest_dirpath, dest_dirnames, dest_filenames = dest_walk_output
+        assert src_dirpath == dest_dirpath
+        for src_dirname, des_dirname in zip(src_dirnames, dest_dirnames):
             assert src_dirname == des_dirname
-        for src_filename, des_filename in zip(src_filenames, des_filenames):
+        for src_filename, des_filename in zip(src_filenames, dest_filenames):
             assert src_filename == des_filename
         
 

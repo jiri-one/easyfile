@@ -20,12 +20,12 @@ class EasyFile:
                 
     async def _copy_directory(self, src_dir: Path, dest: Path, chunk_size: int = 32768):
         """Method for asynchronous copying directories with their content recursively. This function should ideally not be called separately, but always via the "copy" method. If you do call this method, you must ensure that the input parameters are always absolute paths of type Path."""
-        dest = dest / src_dir.name
-        dest.mkdir(exist_ok=True)
         for one_path in src_dir.iterdir():
             if one_path.is_file():
                 self.tasks.append(asyncio.create_task(self._copy_one_file(one_path, dest / one_path.name))) 
             elif one_path.is_dir():
+                dest = dest / src_dir.name
+                dest.mkdir(exist_ok=True)
                 await self._copy_directory(one_path, dest)
     
     @copy_argument_handler
