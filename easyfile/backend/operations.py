@@ -29,7 +29,7 @@ class EasyFile:
                 await self._path_copier(one_path, new_dest)
 
     @copy_argument_handler
-    async def copy(self, path_list: list[Path | str] | Path | str, dest: Path | str, chunk_size: int = 32768):
+    async def copy(self, path_list: list[Path | str], dest: Path | str, chunk_size: int = 32768):
         for one_path in path_list:
             await self._path_copier(one_path, dest)
         self.result = await asyncio.gather(*self.tasks)
