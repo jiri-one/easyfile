@@ -123,7 +123,7 @@ async def test_copy_only_files_in_list(hundred_files: Path, tmp_path: Path):
         assert file_hash_src == file_hash_dest
 
 
-async def test_copy_files_and_dirs_in_list(hundred_files, tmp_path):
+async def test_copy_files_and_dirs_in_list(hundred_files: Path, tmp_path: Path):
     """Testing function, where we copy random files and dirs and test, if the copied files and dirs are same like source files"""
     ef = EasyFile()
     folder_to_copy = tmp_path / "folder_to_copy"
@@ -151,18 +151,26 @@ async def test_copy_files_and_dirs_in_list(hundred_files, tmp_path):
         for src_filename, des_filename in zip(src_filenames, dest_filenames):
             assert src_filename == des_filename
 
-async def test_copy_empty_file_list(tmp_path):
+async def test_copy_empty_file_list(tmp_path: Path):
     ef = EasyFile()
     file_list = []
     with pytest.raises(ValueError):
         await ef.copy(file_list, tmp_path)
 
 
-async def test_copy_list_with_no_paths_or_strings(tmp_path):
+async def test_copy_list_with_no_paths_or_strings(tmp_path: Path):
     ef = EasyFile()
     file_list = [1,2,3]
     with pytest.raises(TypeError):
         await ef.copy(file_list, tmp_path)
+
+async def test_copy_list_of_strings(hundred_files: Path, tmp_path: Path):
+    ef = EasyFile()
+    str_file_list = sample([str(file) for file in hundred_files.iterdir()], 3)
+    dest_folder = tmp_path / "dest_folder"
+    dest_folder.mkdir(parents=True, exist_ok=True)
+    str_dest_folder = str(dest_folder)
+    await ef.copy(str_file_list, str_dest_folder)
         
 
 # test for hash function
