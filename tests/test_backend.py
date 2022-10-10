@@ -11,7 +11,7 @@ from functools import cache
 from os import walk
 
 # internal imports
-from easyfile.backend import EasyFile, hash_file
+from easyfile.backend import EasyFile, hash_file, PathNotFoundError
 # END OF IMPORTS
 
 # All test coroutines will be treated as marked.
@@ -108,6 +108,14 @@ async def test_copy_to_existing_file(hundred_files: Path, tmp_path: Path):
         await ef._copy_one_file(src_file, dest_file)
 
 
+async def test_copy_non_existent_path(tmp_path: Path):
+    ef = EasyFile()
+    src_path = tmp_path / "XXXXXXX"
+    dest_path = tmp_path / "dest_folder"
+    with pytest.raises(PathNotFoundError):
+        await ef._copy_path(src_path, dest_path)
+
+
 async def test_copy_only_files_in_list(hundred_files: Path, tmp_path: Path):
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
     ef = EasyFile()
@@ -176,6 +184,7 @@ async def test_copy_list_of_strings(hundred_files: Path, tmp_path: Path):
     await ef.copy(str_file_list, str_dest_folder)
     for file in file_list:
         assert (dest_folder / file.name).exists()
-    
+
+
 
 # test for hash function
