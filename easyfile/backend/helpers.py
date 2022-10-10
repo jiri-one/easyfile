@@ -42,7 +42,9 @@ def copy_path_argument_handler(f):
     def wrapper(self, src: Path, dest: Path, **kwargs):
         # handle src and check it
         if not src.exists():
-            raise PathNotFoundError("Path has to exist!")
+            raise PathNotFoundError("src path has to exist!")
+        if not dest.exists():
+            raise PathNotFoundError("dest path has to exist!")
         return f(self, src, dest, **kwargs)
     return wrapper
         
@@ -64,6 +66,6 @@ def copy_argument_handler(f):
         if not isinstance(dest, str) and not isinstance(dest, Path):
             raise TypeError("dest argument has to be Path or string.")
         if isinstance(dest, str):
-                dest = Path(dest)
+            dest = Path(dest)
         return f(self, path_list, dest, **kwargs)
     return wrapper

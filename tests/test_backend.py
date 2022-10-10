@@ -110,9 +110,19 @@ async def test_copy_to_existing_file(hundred_files: Path, tmp_path: Path):
 
 async def test_copy_non_existent_path(tmp_path: Path):
     ef = EasyFile()
-    src_path = tmp_path / "XXXXXXX"
+    src_path = tmp_path / "src_path"
     dest_path = tmp_path / "dest_folder"
-    with pytest.raises(PathNotFoundError):
+    dest_path.mkdir(exist_ok=True)
+    with pytest.raises(PathNotFoundError, match="src path has to exist!"):
+        await ef._copy_path(src_path, dest_path)
+
+
+async def test_copy_to_non_existent_path(tmp_path: Path):
+    ef = EasyFile()
+    src_path = tmp_path / "XXXXXXX"
+    src_path.mkdir(exist_ok=True)
+    dest_path = tmp_path / "dest_folder"
+    with pytest.raises(PathNotFoundError, match="dest path has to exist!"):
         await ef._copy_path(src_path, dest_path)
 
 
