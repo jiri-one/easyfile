@@ -38,15 +38,20 @@ def one_file_argument_handler(f):
 def copy_argument_handler(f):
     @wraps(f) # sugar
     def wrapper(self, path_list, dest, **kwargs):
+        # handle path_list (input source)
         if len(path_list) == 0:
-            raise ValueError("path_list can not be empty")
+            raise ValueError("path_list can not be empty")           
         if isinstance(path_list, list):
             if not isinstance(path_list[0], str) and not isinstance(path_list[0], Path):
                 raise TypeError("path_list argument has to be list of Paths of list of strings")
+            if not all(type(val) == type(path_list[0]) for val in path_list):
+                raise TypeError("path_list argument has to be list of Paths of list of strings")
             if isinstance(path_list[0], str):
-                pass
-            # new_path_list = []
-            # for path in path_list:
-            #     new_path_list.append(Path(path))
+                path_list = [Path(path) for path in path_list]
+        # handle dest (output/destination)
+        if not isinstance(dest, str) and not isinstance(dest, Path):
+            raise TypeError("dest argument has to be Path or string.")
+        if isinstance(dest, str):
+                dest = Path(dest)
         return f(self, path_list, dest, **kwargs)
     return wrapper

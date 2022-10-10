@@ -166,11 +166,14 @@ async def test_copy_list_with_no_paths_or_strings(tmp_path: Path):
 
 async def test_copy_list_of_strings(hundred_files: Path, tmp_path: Path):
     ef = EasyFile()
-    str_file_list = sample([str(file) for file in hundred_files.iterdir()], 3)
+    file_list = sample(list(hundred_files.iterdir()), 3)
+    str_file_list = [str(file) for file in file_list]
     dest_folder = tmp_path / "dest_folder"
     dest_folder.mkdir(parents=True, exist_ok=True)
     str_dest_folder = str(dest_folder)
     await ef.copy(str_file_list, str_dest_folder)
-        
+    for file in file_list:
+        assert (dest_folder / file.name).exists()
+    
 
 # test for hash function
