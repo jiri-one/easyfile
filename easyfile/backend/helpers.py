@@ -2,6 +2,8 @@ from hashlib import sha256
 from aiofile import async_open
 from pathlib import Path
 from functools import wraps
+# internal imports
+from .exceptions import PathNotFoundError
 
 async def hash_file(filename):
     """"This function returns the SHA-256 hash
@@ -18,7 +20,7 @@ async def hash_file(filename):
     # return the hex representation of digest
     return h.hexdigest()
 
-def one_file_argument_handler(f):
+def copy_one_file_argument_handler(f):
     @wraps(f) # sugar
     def wrapper(self, src_file: Path, dest_file: Path, **kwargs):
         # handle src_file
@@ -35,16 +37,26 @@ def one_file_argument_handler(f):
     return wrapper
 
 
+def copy_path_argument_handler(f):
+    @wraps(f) # sugar
+    def wrapper(self, src: Path, dest: Path, **kwargs):
+        # handle src and check it
+        if not src.exists():
+            raise PathNotFoundError("Path has to exist!")
+        return f(self, src, dest, **kwargs)
+    return wrapper
+        
+
 def copy_argument_handler(f):
     @wraps(f) # sugar
-    def wrapper(self, path_list, dest, **kwargs):
+    def wrapper(self, path_list: list[Path | str], dest: Path | str, **kwargs):
         # handle path_list (input source)
         if len(path_list) == 0:
             raise ValueError("path_list can not be empty")           
         if isinstance(path_list, list):
             if not isinstance(path_list[0], str) and not isinstance(path_list[0], Path):
                 raise TypeError("path_list argument has to be list of Paths of list of strings")
-            if not all(type(val) == type(path_list[0]) for val in path_list):
+            if not all(type(path) == type(path_list[0]) for path in path_list):
                 raise TypeError("path_list argument has to be list of Paths of list of strings")
             if isinstance(path_list[0], str):
                 path_list = [Path(path) for path in path_list]

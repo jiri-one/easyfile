@@ -151,6 +151,7 @@ async def test_copy_files_and_dirs_in_list(hundred_files: Path, tmp_path: Path):
         for src_filename, des_filename in zip(src_filenames, dest_filenames):
             assert src_filename == des_filename
 
+
 async def test_copy_empty_file_list(tmp_path: Path):
     ef = EasyFile()
     file_list = []
@@ -163,6 +164,7 @@ async def test_copy_list_with_no_paths_or_strings(tmp_path: Path):
     file_list = [1,2,3]
     with pytest.raises(TypeError):
         await ef.copy(file_list, tmp_path)
+
 
 async def test_copy_list_of_strings(hundred_files: Path, tmp_path: Path):
     ef = EasyFile()
