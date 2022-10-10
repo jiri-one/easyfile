@@ -19,6 +19,9 @@ pytestmark = pytest.mark.asyncio
 
 # pytest fixtures (helper functions for tests)
 
+@pytest.fixture(autouse=True)
+def ef():
+    return EasyFile()
 
 @pytest.fixture(scope="session", autouse=True)
 def event_loop():
@@ -57,9 +60,8 @@ async def hundred_files(event_loop, tmp_path_factory):
 
 # TESTS
 
-async def test_successful_copy_one_file(hundred_files: Path, tmp_path: Path):
+async def test_successful_copy_one_file(ef, hundred_files: Path, tmp_path: Path):
     """Testing function, where we test copy one file and test, if the copied file is same like source file"""
-    ef = EasyFile()
     src_file = hundred_files / f"test.file.{str(randint(1, 100)).zfill(3)}"
     dest_file = tmp_path / src_file.with_name(
         str(src_file.name) + "_copied").name  # name of destination file
@@ -70,9 +72,8 @@ async def test_successful_copy_one_file(hundred_files: Path, tmp_path: Path):
     assert src_hash == dest_hash  # hashes have to be same
 
 
-async def test_copy_one_file_but_dir(hundred_files: Path, tmp_path: Path):
+async def test_copy_one_file_but_dir(ef, hundred_files: Path, tmp_path: Path):
     """Testing function, where we test copy one directory and not file."""
-    ef = EasyFile()
     src_dir = tmp_path / "src_dir"
     src_dir.mkdir()
     dest_file = tmp_path / "some.file"
@@ -80,18 +81,16 @@ async def test_copy_one_file_but_dir(hundred_files: Path, tmp_path: Path):
         await ef._copy_one_file(src_dir, dest_file)
 
 
-async def test_copy_one_non_existent_file(tmp_path: Path):
+async def test_copy_one_non_existent_file(ef, tmp_path: Path):
     """Testing function, where we test copy one non-existent file."""
-    ef = EasyFile()
     src_file = tmp_path / "XXXXXXX"
     dest_file = tmp_path / "XXXXXXX_copied"
     with pytest.raises(FileNotFoundError):
         await ef._copy_one_file(src_file, dest_file)
 
 
-async def test_copy_one_file_to_dir_except_of_file(hundred_files: Path, tmp_path: Path):
+async def test_copy_one_file_to_dir_except_of_file(ef, hundred_files: Path, tmp_path: Path):
     """Testing function, where we test copy one file to existing directory except of file."""
-    ef = EasyFile()
     src_file = hundred_files / f"test.file.{str(randint(1, 100)).zfill(3)}"
     dest_file = tmp_path / "XXXXXXX"
     dest_file.mkdir()
@@ -99,17 +98,15 @@ async def test_copy_one_file_to_dir_except_of_file(hundred_files: Path, tmp_path
         await ef._copy_one_file(src_file, dest_file)
 
 
-async def test_copy_to_existing_file(hundred_files: Path, tmp_path: Path):
+async def test_copy_to_existing_file(ef, hundred_files: Path, tmp_path: Path):
     """Testing function, where we test copy to already existing file."""
-    ef = EasyFile()
     src_file = hundred_files / f"test.file.{str(randint(1, 50)).zfill(3)}"
     dest_file = hundred_files / f"test.file.{str(randint(50, 100)).zfill(3)}"
     with pytest.raises(FileExistsError):
         await ef._copy_one_file(src_file, dest_file)
 
 
-async def test_copy_non_existent_path(tmp_path: Path):
-    ef = EasyFile()
+async def test_copy_non_existent_path(ef, tmp_path: Path):
     src_path = tmp_path / "src_path"
     dest_path = tmp_path / "dest_folder"
     dest_path.mkdir(exist_ok=True)
@@ -117,8 +114,7 @@ async def test_copy_non_existent_path(tmp_path: Path):
         await ef._copy_path(src_path, dest_path)
 
 
-async def test_copy_to_non_existent_path(tmp_path: Path):
-    ef = EasyFile()
+async def test_copy_to_non_existent_path(ef, tmp_path: Path):
     src_path = tmp_path / "XXXXXXX"
     src_path.mkdir(exist_ok=True)
     dest_path = tmp_path / "dest_folder"
@@ -126,9 +122,8 @@ async def test_copy_to_non_existent_path(tmp_path: Path):
         await ef._copy_path(src_path, dest_path)
 
 
-async def test_copy_only_files_in_list(hundred_files: Path, tmp_path: Path):
+async def test_copy_only_files_in_list(ef, hundred_files: Path, tmp_path: Path):
     """Testing function, where we copy ten random files and test, if the copied files are same like source files"""
-    ef = EasyFile()
     file_list = [
         f"test.file.{str(number).zfill(3)}" for number in sample(range(1, 101), 10)]
     dest_folder = tmp_path / "dest_folder"
@@ -141,9 +136,8 @@ async def test_copy_only_files_in_list(hundred_files: Path, tmp_path: Path):
         assert file_hash_src == file_hash_dest
 
 
-async def test_copy_files_and_dirs_in_list(hundred_files: Path, tmp_path: Path):
+async def test_copy_files_and_dirs_in_list(ef, hundred_files: Path, tmp_path: Path):
     """Testing function, where we copy random files and dirs and test, if the copied files and dirs are same like source files"""
-    ef = EasyFile()
     folder_to_copy = tmp_path / "folder_to_copy"
     folder1 = folder_to_copy / "src_folder1"
     subfolder1 = folder1 / "src_subfolder1"
@@ -170,22 +164,19 @@ async def test_copy_files_and_dirs_in_list(hundred_files: Path, tmp_path: Path):
             assert src_filename == des_filename
 
 
-async def test_copy_empty_file_list(tmp_path: Path):
-    ef = EasyFile()
+async def test_copy_empty_file_list(ef, tmp_path: Path):
     file_list = []
     with pytest.raises(ValueError):
         await ef.copy(file_list, tmp_path)
 
 
-async def test_copy_list_with_no_paths_or_strings(tmp_path: Path):
-    ef = EasyFile()
+async def test_copy_list_with_no_paths_or_strings(ef, tmp_path: Path):
     file_list = [1,2,3]
     with pytest.raises(TypeError):
         await ef.copy(file_list, tmp_path)
 
 
-async def test_copy_list_of_strings(hundred_files: Path, tmp_path: Path):
-    ef = EasyFile()
+async def test_copy_list_of_strings(ef, hundred_files: Path, tmp_path: Path):
     file_list = sample(list(hundred_files.iterdir()), 3)
     str_file_list = [str(file) for file in file_list]
     dest_folder = tmp_path / "dest_folder"
