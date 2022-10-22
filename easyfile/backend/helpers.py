@@ -1,9 +1,10 @@
 from hashlib import sha256
-from aiofile import async_open
 from anyio import Path
+from anyio.streams.file import FileReadStream, FileWriteStream
 from functools import wraps
 # internal imports
 from .exceptions import PathNotFoundError
+
 
 async def hash_file(filename):
     """"This function returns the SHA-256 hash
@@ -13,8 +14,8 @@ async def hash_file(filename):
     h = sha256()
 
     # open file for reading in binary mode
-    async with async_open(str(filename),'rb') as file:
-        async for chunk in file.iter_chunked(32768):
+    async with await FileReadStream.from_path(filename) as file:
+        async for chunk in file:
             h.update(chunk)
 
     # return the hex representation of digest
@@ -41,9 +42,9 @@ def copy_path_argument_handler(f):
     @wraps(f) # sugar
     async def wrapper(self, src: Path, dest: Path, **kwargs):
         # handle src and check it
-        if not src.exists():
+        if not await src.exists():
             raise PathNotFoundError("src path has to exist!")
-        if not dest.exists():
+        if not await dest.exists():
             raise PathNotFoundError("dest path has to exist!")
         return await f(self, src, dest, **kwargs)
     return wrapper

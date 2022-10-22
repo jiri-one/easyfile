@@ -1,18 +1,4 @@
 [[package]]
-name = "aiofile"
-version = "3.8.1"
-description = "Asynchronous file operations."
-category = "main"
-optional = false
-python-versions = ">=3.7, <4"
-
-[package.dependencies]
-caio = ">=0.9.0,<0.10.0"
-
-[package.extras]
-develop = ["aiomisc", "pytest", "pytest-cov"]
-
-[[package]]
 name = "anyio"
 version = "3.6.2"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
@@ -54,17 +40,6 @@ python-versions = "*"
 [package.dependencies]
 pycodestyle = ">=2.9.1"
 toml = "*"
-
-[[package]]
-name = "caio"
-version = "0.9.8"
-description = "Asynchronous file IO for Linux MacOS or Windows."
-category = "main"
-optional = false
-python-versions = ">=3.5, <4"
-
-[package.extras]
-develop = ["aiomisc", "pytest", "pytest-cov"]
 
 [[package]]
 name = "colorama"
@@ -201,12 +176,9 @@ python-versions = ">=3.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "2bbdf336ead77e951a6eeac6df068c1a3522562b2fe3e993db2c14f5e546c7d5"
+content-hash = "fb75beca2bbe7893b800d428a501fbc2c54ba6af5d3691fbe5b332ee3aa8b4f0"
 
 [metadata.files]
-aiofile = [
-    {file = "aiofile-3.8.1.tar.gz", hash = "sha256:1623b98d88fbd16bbd2808d010de4e185a700e950ed3f17455dd851aa2455f40"},
-]
 anyio = [
     {file = "anyio-3.6.2-py3-none-any.whl", hash = "sha256:fbbe32bd270d2a2ef3ed1c5d45041250284e31fc0a4df4a5a6071842051a51e3"},
     {file = "anyio-3.6.2.tar.gz", hash = "sha256:25ea0d673ae30af41a0c442f81cf3b38c7e79fdc7b60335a4c14e05eb0947421"},
@@ -218,18 +190,6 @@ attrs = [
 autopep8 = [
     {file = "autopep8-1.7.0-py2.py3-none-any.whl", hash = "sha256:6f09e90a2be784317e84dc1add17ebfc7abe3924239957a37e5040e27d812087"},
     {file = "autopep8-1.7.0.tar.gz", hash = "sha256:ca9b1a83e53a7fad65d731dc7a2a2d50aa48f43850407c59f6a1a306c4201142"},
-]
-caio = [
-    {file = "caio-0.9.8-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:e9969edea88caf2d38059fe7164d1271f8ba6d94d39e890a9bdbabca483a9a19"},
-    {file = "caio-0.9.8-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:38a30e7e0184b45a54fbc757ac3e1a2b8eb9c41f362d2f4bf5854d50bff73c6d"},
-    {file = "caio-0.9.8-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:7275e5ca3a4960d40ca509ed19d7d23ea0156dbb4ac5834cf08724c989f8be24"},
-    {file = "caio-0.9.8-cp37-cp37m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:2316252dbb16195b0292a5dd665901966c080001d0ceed8540f98c073b921b0c"},
-    {file = "caio-0.9.8-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:d29709f5ff9582d00ebed37327f14e247eedf33e18d4b35a6af6ab30cc8df9b7"},
-    {file = "caio-0.9.8-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:65395113a506efb605d90c75438686718c1d4784bc029e04d235adcf5d5d3a39"},
-    {file = "caio-0.9.8-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:f748b0605b9b95bfa58c81a5373555d4c82228f9b3dfd608de706a906fe703f9"},
-    {file = "caio-0.9.8-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:0ab003c48679d00b83992d68012c1126e4b91d6c27d16f363d0e5c9a499898e9"},
-    {file = "caio-0.9.8-py3-none-any.whl", hash = "sha256:c3704fba1781c252d5dcfce4e81dc5af2d50a61062f00fc74dd252a419af8918"},
-    {file = "caio-0.9.8.tar.gz", hash = "sha256:70c9556dc003df1e3ea8dca5cc32ef0bb9213cfbc5a2b80003ba37018689326f"},
 ]
 colorama = [
     {file = "colorama-0.4.5-py2.py3-none-any.whl", hash = "sha256:854bf444933e37f5824ae7bfc1e98d5bce2ebe4160d46b5edf346a89358e99da"},
