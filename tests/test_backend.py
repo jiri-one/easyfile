@@ -2,9 +2,10 @@
 
 # imports needed for testing
 import pytest
+import pytest_asyncio
 import asyncio
 from aiofile import async_open
-from pathlib import Path
+from anyio import Path
 from string import ascii_letters, punctuation
 from random import choice, randint, sample
 from functools import cache
@@ -19,7 +20,7 @@ pytestmark = pytest.mark.asyncio
 
 # pytest fixtures (helper functions for tests)
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def ef():
     return EasyFile()
 
@@ -44,26 +45,31 @@ async def giga_file(event_looper, tmp_path_factory):
 
 
 @cache
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="module")
 async def hundred_files(event_loop, tmp_path_factory):
     """This corutine will create 100 files with random size and random content, every file named test.file.NUM in folder files"""
-    hundred_files_path = tmp_path_factory.mktemp("files")
+    hundred_files_path = Path(str(tmp_path_factory.mktemp("files")))
     for file_number in range(1, 101):
         file_number = str(file_number).zfill(3)
         char_to_file = bytes(choice(ascii_letters + punctuation), 'utf-8')
-        async with async_open(hundred_files_path / f"test.file.{file_number}", "wb") as dest:
+        async with async_open(str(hundred_files_path / f"test.file.{file_number}"), "wb") as dest:
             # create 100 files of random size to 1MB
             await dest.write(char_to_file * randint(0, 1024 * 1024))
     return hundred_files_path
+
+@cache
+@pytest_asyncio.fixture()
+async def atmp_path(tmp_path):
+    return Path(str(tmp_path))
 
 # thats the end of fixtures
 
 # TESTS
 
-async def test_successful_copy_one_file(ef, hundred_files: Path, tmp_path: Path):
+async def test_successful_copy_one_file(ef, hundred_files: Path, atmp_path: Path):
     """Testing function, where we test copy one file and test, if the copied file is same like source file"""
     src_file = hundred_files / f"test.file.{str(randint(1, 100)).zfill(3)}"
-    dest_file = tmp_path / src_file.with_name(
+    dest_file = atmp_path / src_file.with_name(
         str(src_file.name) + "_copied").name  # name of destination file
     await ef._copy_one_file(src_file, dest_file)  # make a copy of file
     src_hash = await hash_file(src_file)  # hash of source file
