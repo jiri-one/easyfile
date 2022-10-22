@@ -2,7 +2,6 @@
 
 # imports needed for testing
 import pytest
-import pytest_asyncio
 import asyncio
 from anyio import Path
 from anyio.streams.file import FileWriteStream
@@ -16,24 +15,28 @@ from easyfile.backend import EasyFile, hash_file, PathNotFoundError
 # END OF IMPORTS
 
 # All test coroutines will be treated as marked.
-pytestmark = pytest.mark.asyncio
+pytestmark = pytest.mark.anyio
 
 # pytest fixtures (helper functions for tests)
+
+@pytest.fixture(scope='module')
+def anyio_backend():
+    return 'asyncio'
 
 @pytest.fixture()
 def ef():
     return EasyFile()
 
-@pytest.fixture(scope="session", autouse=True)
-def event_loop():
-    """We need only one asyncio loop for all fixtures, because is better to create test files only once."""
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
+# @pytest.fixture(scope="session", autouse=True)
+# def event_loop():
+#     """We need only one asyncio loop for all fixtures, because is better to create test files only once."""
+#     loop = asyncio.new_event_loop()
+#     yield loop
+#     loop.close()
 
 
 @cache
-@pytest_asyncio.fixture(scope="module")
+@pytest.fixture(scope="module")
 async def giga_file(tmp_path_factory):
     """This corutine will create one file named test.file.giga in folder files"""
     giga_file_path = Path(tmp_path_factory.mktemp("files") / "test.file.giga")
@@ -45,7 +48,7 @@ async def giga_file(tmp_path_factory):
 
 
 @cache
-@pytest_asyncio.fixture(scope="module")
+@pytest.fixture(scope="module")
 async def hundred_files(tmp_path_factory):
     """This corutine will create 100 files with random size and random content, every file named test.file.NUM in folder files"""
     hundred_files_path = Path(tmp_path_factory.mktemp("files"))
@@ -58,7 +61,7 @@ async def hundred_files(tmp_path_factory):
     return hundred_files_path
 
 @cache
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def atmp_path(tmp_path):
     return Path(tmp_path)
 
