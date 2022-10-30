@@ -18,7 +18,7 @@ class EasyFile:
     @copy_one_file_argument_handler
     async def _copy_one_file(self, src_file: Path, dest_file: Path):
         """Method for asynchronous copying of one file. This method should ideally not be called separately, but always via the "copy" function. If you do call this function, you must ensure that the input parameters are always absolute paths of type Path."""
-        await aioshutil.copy2(src_file, dest_file)
+        return await aioshutil.copy2(src_file, dest_file)
 
 
     @copy_path_argument_handler
