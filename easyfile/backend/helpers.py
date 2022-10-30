@@ -1,6 +1,6 @@
 from hashlib import sha256
 from anyio import Path
-from anyio.streams.file import FileReadStream, FileWriteStream
+from anyio.streams.file import FileReadStream
 from functools import wraps
 # internal imports
 from .exceptions import PathNotFoundError
