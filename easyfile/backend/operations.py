@@ -1,4 +1,5 @@
 import asyncio
+import aioshutil
 from anyio import Path
 from anyio.streams.file import FileReadStream, FileWriteStream
 
@@ -15,15 +16,13 @@ class EasyFile:
     
 
     @copy_one_file_argument_handler
-    async def _copy_one_file(self, src_file: Path, dest_file: Path, chunk_size: int = 32768):
+    async def _copy_one_file(self, src_file: Path, dest_file: Path):
         """Method for asynchronous copying of one file. This method should ideally not be called separately, but always via the "copy" function. If you do call this function, you must ensure that the input parameters are always absolute paths of type Path."""
-        async with await FileReadStream.from_path(src_file) as src_file, await FileWriteStream.from_path(dest_file) as dest_file:
-            async for chunk in src_file:
-                await dest_file.send(chunk)
+        await aioshutil.copy2(src_file, dest_file)
 
 
     @copy_path_argument_handler
-    async def _copy_path(self, src: Path, dest: Path, chunk_size: int = 32768):
+    async def _copy_path(self, src: Path, dest: Path):
         """Method for asynchronous copying paths (dirs and files) with their content recursively. This function should ideally not be called separately, but always via the "copy" method. If you do call this method, you must ensure that the input parameters are always absolute paths of type Path."""
         if await src.is_file():
             self.tasks.append(asyncio.create_task(self._copy_one_file(src, dest / src.name)))
@@ -35,7 +34,7 @@ class EasyFile:
 
 
     @copy_argument_handler
-    async def copy(self, path_list: list[Path | str], dest: Path | str, chunk_size: int = 32768):
+    async def copy(self, path_list: list[Path | str], dest: Path | str):
         for one_path in path_list:
             await self._copy_path(one_path, dest)
         self.result = await asyncio.gather(*self.tasks)

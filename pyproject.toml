@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 anyio = "^3.6.2"
+aioshutil = "^1.2"
 
 [tool.poetry.group.tests.dependencies]
 pytest = "^7.1.3"
