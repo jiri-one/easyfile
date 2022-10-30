@@ -7,7 +7,8 @@ from anyio.streams.file import FileReadStream, FileWriteStream
 from .helpers import (
     copy_one_file_argument_handler,
     copy_path_argument_handler,
-    copy_argument_handler)
+    copy_argument_handler,
+    path_list_to_agen)
 
 
 class EasyFile:
@@ -35,7 +36,7 @@ class EasyFile:
 
     @copy_argument_handler
     async def copy(self, path_list: list[Path | str], dest: Path | str):
-        for one_path in path_list:
+        async for one_path in path_list_to_agen(path_list):
             await self._copy_path(one_path, dest)
         self.result = await asyncio.gather(*self.tasks)
 

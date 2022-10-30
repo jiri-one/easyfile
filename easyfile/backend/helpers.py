@@ -21,6 +21,10 @@ async def hash_file(filename):
     # return the hex representation of digest
     return h.hexdigest()
 
+async def path_list_to_agen(path_list):
+    for path in path_list:
+        yield path
+
 def copy_one_file_argument_handler(f):
     @wraps(f) # sugar
     async def wrapper(self, src_file: Path, dest_file: Path, **kwargs):
