@@ -27,7 +27,7 @@ class EasyFile:
             self.tg.create_task(self._copy_one_file(src, dest / src.name))
         elif await src.is_dir(): 
             new_dest = dest / src.name
-            await new_dest.mkdir(exist_ok=True)
+            self.tg.create_task(new_dest.mkdir(exist_ok=True))
             async for one_path in src.iterdir():
                 await self._copy_path(one_path, new_dest)
 
