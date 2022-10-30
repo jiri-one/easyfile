@@ -1,7 +1,6 @@
 import asyncio
 import aioshutil
 from anyio import Path
-from anyio.streams.file import FileReadStream, FileWriteStream
 
 # internal imports
 from .helpers import (
@@ -13,8 +12,7 @@ from .helpers import (
 
 class EasyFile:
     def __init__(self):
-        self.tasks: list = []
-    
+        ...    
 
     @copy_one_file_argument_handler
     async def _copy_one_file(self, src_file: Path, dest_file: Path):
@@ -26,7 +24,7 @@ class EasyFile:
     async def _copy_path(self, src: Path, dest: Path):
         """Method for asynchronous copying paths (dirs and files) with their content recursively. This function should ideally not be called separately, but always via the "copy" method. If you do call this method, you must ensure that the input parameters are always absolute paths of type Path."""
         if await src.is_file():
-            self.tasks.append(asyncio.create_task(self._copy_one_file(src, dest / src.name)))
+            self.tg.create_task(self._copy_one_file(src, dest / src.name))
         elif await src.is_dir(): 
             new_dest = dest / src.name
             await new_dest.mkdir(exist_ok=True)
@@ -36,13 +34,14 @@ class EasyFile:
 
     @copy_argument_handler
     async def copy(self, path_list: list[Path | str], dest: Path | str):
-        async for one_path in path_list_to_agen(path_list):
-            await self._copy_path(one_path, dest)
-        self.result = await asyncio.gather(*self.tasks)
+        async with asyncio.TaskGroup() as self.tg:
+            async for one_path in path_list_to_agen(path_list):
+                await self._copy_path(one_path, dest)
 
 
-# move one file ... decorator?
-# move file list ... decorator?
+
+# move one file
+# move file list
 # delete one file
 # delete file list
 # open file
