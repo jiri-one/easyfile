@@ -16,13 +16,13 @@ class EasyFile:
 
     @copy_one_file_argument_handler
     async def _copy_one_file(self, src_file: Path, dest_file: Path):
-        """Method for asynchronous copying of one file. This method should ideally not be called separately, but always via the "copy" function. If you do call this function, you must ensure that the input parameters are always absolute paths of type Path."""
+        """Method for asynchronous copying of one file. This method should ideally not be called separately, but always via the "copy" method."""
         return await aioshutil.copy2(src_file, dest_file)
 
 
     @copy_path_argument_handler
     async def _copy_path(self, src: Path, dest: Path):
-        """Method for asynchronous copying paths (dirs and files) with their content recursively. This function should ideally not be called separately, but always via the "copy" method. If you do call this method, you must ensure that the input parameters are always absolute paths of type Path."""
+        """Method for asynchronous copying paths (dirs and files) with their content recursively. This function should ideally not be called separately, but always via the "copy" method."""
         if await src.is_file():
             self._tg.create_task(self._copy_one_file(src, dest / src.name))
         elif await src.is_dir(): 
@@ -34,6 +34,7 @@ class EasyFile:
 
     @copy_argument_handler
     async def copy(self, path_list: list[Path | str], dest: Path | str):
+        """Main method for asynchronous copying."""
         async with asyncio.TaskGroup() as self._tg:
             async for one_path in path_list_to_agen(path_list):
                 await self._copy_path(one_path, dest)
